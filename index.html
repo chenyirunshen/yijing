@@ -278,6 +278,26 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft
   font-size:13.5px;color:var(--ink2);margin-top:11px;
 }
 .mv-note b{color:var(--accent)}
+
+/* ---- 卦象 → 处境 → 结论 的桥接 ---- */
+.xiang-box{
+  background:#fbf8f0;border:1px solid #ece2cd;border-radius:9px;
+  padding:12px 15px;font-size:14.5px;line-height:1.85;color:var(--ink2);margin-bottom:11px;
+}
+.xiang-box b{color:#8a6c25}
+.bridge{margin-top:2px}
+.b-row{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-top:1px dashed #e6dcc4}
+.b-row:first-child{border-top:0;padding-top:0}
+.b-tag{
+  flex:none;min-width:58px;font-size:11.5px;font-weight:800;color:var(--gold);
+  letter-spacing:.08em;padding-top:3px;
+}
+.b-txt{font-size:14.6px;line-height:1.9;color:var(--ink2)}
+.b-arrow{text-align:center;color:#d6c6a2;font-size:13px;line-height:1;margin:-3px 0}
+.b-row.hl{background:#fff8ec;border-radius:9px;padding:13px 14px;border:0;margin-top:2px}
+.b-row.hl .b-tag{color:var(--accent)}
+.b-row.hl .b-txt{color:var(--ink);font-weight:500}
+.b-q{color:var(--ink);font-weight:600}
 </style>
 </head>
 <body>
@@ -437,6 +457,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft
 
 <script src="data.js"></script>
 <script src="advice.js"></script>
+<script src="bridge.js"></script>
 <script>
 /* ============================================================
    八卦表（先天数：乾1兑2离3震4巽5坎6艮7坤8）
@@ -929,6 +950,12 @@ function rollLines(){
 
 const NMAP={'上吉':'n-good','吉':'n-good','平':'n-mid','吝':'n-bad','凶':'n-bad'};
 
+/* 转义用户输入的问句，避免特殊字符破坏页面 */
+function esc(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function renderAskResult(q,type,lines,save){
   const d=divine(lines), ben=d.ben, bian=d.bian;
   const adv=(window.YJ_ADVICE||{})[ben.n]||{};
@@ -959,17 +986,32 @@ function renderAskResult(q,type,lines,save){
      '左边是<b>现在的处境</b>，右边是<b>发展下去的走向</b>，红框是动爻——这件事的关键变量。</div>';
   h+='</div>';
 
-  /* ③ 这一卦在说什么 */
-  h+='<div class="read-sec"><h3><span class="no">3</span>这一卦在说什么</h3>'+
+  /* ③ 这一卦画的是什么、在说什么 */
+  const br=(window.YJ_BRIDGE||{})[ben.n]||{};
+  h+='<div class="read-sec"><h3><span class="no">3</span>这一卦画的是什么</h3>'+
+     '<div class="xiang-box"><b>卦象　</b>'+(br.xiang||ben.full)+'</div>'+
      '<div class="quote"><div class="t">卦 辞</div>'+ben.judge+'</div>'+
      '<div class="quote"><div class="t">大 象 传</div>'+ben.image+'</div>'+
-     '<div class="hint" style="color:var(--ink2);font-size:13.5px;line-height:1.9;margin-top:8px">'+ben.desc+'</div>'+
      '</div>';
 
-  /* ④ 落到你这件事上 */
-  h+='<div class="read-sec"><h3 class="acc"><span class="no">4</span>落到你这件事上</h3>'+
-     '<div class="advice-box"><span class="tag">'+typeName+'</span><br>'+
-     (adv[type]||ben.desc)+'</div>';
+  /* ④ 桥接：卦象 → 你的处境 → 结论 —— 这一步把「卦」和「你问的事」缝起来 */
+  const rawQ=q.length>30?q.slice(0,30)+'…':q;
+  const qShort=esc(rawQ);
+  h+='<div class="read-sec"><h3 class="acc"><span class="no">4</span>这一卦落到你这件事上</h3>'+
+     '<div class="advice-box"><span class="tag">'+typeName+'　·　结合你写的这件事</span>'+
+     '<div class="bridge">'+
+       '<div class="b-row"><span class="b-tag">你问的是</span>'+
+         '<div class="b-txt"><span class="b-q">「'+qShort+'」</span></div></div>'+
+       '<div class="b-arrow">↓</div>'+
+       '<div class="b-row"><span class="b-tag">卦象说的</span>'+
+         '<div class="b-txt">'+(br.xiang||ben.desc)+'</div></div>'+
+       '<div class="b-arrow">↓</div>'+
+       '<div class="b-row"><span class="b-tag">你的处境</span>'+
+         '<div class="b-txt">'+(br.map||ben.desc)+'</div></div>'+
+       '<div class="b-arrow">↓</div>'+
+       '<div class="b-row hl"><span class="b-tag">所以</span>'+
+         '<div class="b-txt">'+(adv[type]||ben.desc)+'</div></div>'+
+     '</div></div>';
   const r=buildReading(d);
   const focus=(r.primary[0]&&r.primary[0].hit)?ben.yao[r.primary[0].hit-1]:null;
   if(focus){
