@@ -207,7 +207,77 @@ footer b{color:var(--accent)}
 @media(min-width:640px){
   .grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
   .stack .b{width:110px}
+  body{font-size:15.5px}
 }
+
+/* ================= 问事页 ================= */
+textarea{
+  width:100%;padding:13px 14px;font-size:15px;font-family:inherit;line-height:1.75;
+  border:1px solid var(--line);border-radius:10px;background:#fdfcfa;color:var(--ink);
+  outline:none;resize:vertical;min-height:88px;
+}
+textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ask-card{background:linear-gradient(180deg,#fffdf8,#fff);border-color:#ece2cd}
+.asktypes{display:flex;flex-wrap:wrap;gap:7px}
+.asktypes button{
+  padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--paper);
+  color:var(--ink2);font-size:13px;font-family:inherit;cursor:pointer;transition:.15s;
+}
+.asktypes button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+
+/* ---- 解读结果 ---- */
+.nature{display:inline-block;font-size:12px;font-weight:800;padding:3px 11px;border-radius:6px;letter-spacing:.06em}
+.nature.n-good{background:#e7f1e5;color:#2f6b34}
+.nature.n-mid{background:var(--gold-soft);color:#8a6c25}
+.nature.n-bad{background:#fbeceb;color:var(--accent)}
+
+.read-sec{margin-top:22px}
+.read-sec:first-child{margin-top:0}
+.read-sec h3{
+  font-size:13.5px;font-weight:800;letter-spacing:.1em;color:var(--ink);
+  margin-bottom:10px;display:flex;align-items:center;gap:9px;
+}
+.read-sec h3 .no{
+  width:21px;height:21px;border-radius:6px;background:var(--ink);color:#fff;
+  font-size:11px;display:flex;align-items:center;justify-content:center;flex:none;
+}
+.read-sec h3.acc .no{background:var(--accent)}
+.ask-q{
+  background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--ink);
+  padding:13px 15px;border-radius:0 8px 8px 0;font-size:15px;line-height:1.8;
+}
+.ask-q .q-label{font-size:11px;color:var(--ink3);letter-spacing:.14em;font-weight:700;margin-bottom:3px}
+.advice-box{
+  background:linear-gradient(135deg,#fffaf4,#fdf6ec);
+  border:1px solid #f0e3c8;border-radius:10px;padding:15px 17px;
+  font-size:14.8px;line-height:2;color:var(--ink2);
+}
+.advice-box .tag{
+  display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--gold);
+  padding:2px 9px;border-radius:5px;margin-bottom:10px;letter-spacing:.1em;
+}
+.todo-list{margin:0;padding:0;list-style:none;counter-reset:t}
+.todo-list li{
+  counter-increment:t;position:relative;padding:11px 0 11px 34px;
+  border-top:1px dashed var(--line);font-size:14.5px;line-height:1.85;color:var(--ink2);
+}
+.todo-list li:first-child{border-top:0}
+.todo-list li::before{
+  content:counter(t);position:absolute;left:0;top:12px;
+  width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+  font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;
+}
+.todo-list li b{color:var(--ink)}
+.act-line{
+  margin-top:16px;padding:13px 15px;background:var(--ink);color:#fff;border-radius:9px;
+  font-size:14.5px;text-align:center;letter-spacing:.02em;line-height:1.7;
+}
+.act-line b{color:#ffd7a3}
+.mv-note{
+  background:var(--accent-soft);border-radius:8px;padding:11px 14px;
+  font-size:13.5px;color:var(--ink2);margin-top:11px;
+}
+.mv-note b{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -218,8 +288,29 @@ footer b{color:var(--accent)}
     <p>金钱卦 · 数字 · 时间 · 手动　|　王弼义理解卦　|　依《周易》通行本</p>
   </header>
 
+  <!-- ============ 问事 ============ -->
+  <div class="view on" id="v-ask">
+
+    <div class="card ask-card">
+      <h2 class="sec" style="margin:0 0 14px">写下你要问的事</h2>
+      <textarea id="askText" rows="3" placeholder="越具体越好。&#10;例：这份新工作要不要接？&#10;例：和 XX 的关系还要不要争取？"></textarea>
+      <div class="flabel" style="margin-top:14px">属于哪一类（不选，程序会自动判断）</div>
+      <div class="asktypes" id="askTypes"></div>
+      <button class="btn" id="btnAsk" style="margin-top:16px">占 这 一 卦</button>
+      <div class="hint" style="margin-top:10px;text-align:center">
+        一事一问。想清楚了再占——<b>第一卦就是你的卦，别反复重摇。</b>
+      </div>
+    </div>
+
+    <div id="askResult"></div>
+
+    <h2 class="sec">问 事 记 录</h2>
+    <div id="askHist"></div>
+    <button class="btn ghost sm" id="btnClearAsk" style="margin-top:4px">清 空 记 录</button>
+  </div>
+
   <!-- ============ 起卦 ============ -->
-  <div class="view on" id="v-div">
+  <div class="view" id="v-div">
 
     <div class="card" onclick="toggleHowto()" style="padding:12px 16px;cursor:pointer;margin-bottom:12px;background:var(--gold-soft);border-color:#e8dcb8">
       <div style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--gold)">
@@ -339,11 +430,13 @@ footer b{color:var(--accent)}
 </footer>
 
 <nav class="tabbar" id="tabbar">
-  <button class="on" data-v="v-div"><span class="ic">☯</span>起卦</button>
-  <button data-v="v-list"><span class="ic">☰</span>六十四卦</button>
+  <button class="on" data-v="v-ask"><span class="ic">✦</span>问事</button>
+  <button data-v="v-div"><span class="ic">☯</span>起卦</button>
+  <button data-v="v-list"><span class="ic">☰</span>卦典</button>
 </nav>
 
 <script src="data.js"></script>
+<script src="advice.js"></script>
 <script>
 /* ============================================================
    八卦表（先天数：乾1兑2离3震4巽5坎6艮7坤8）
@@ -791,6 +884,160 @@ document.getElementById('tabbar').onclick=e=>{
   document.getElementById(b.dataset.v).classList.add('on');
   window.scrollTo(0,0);
 };
+
+/* ============================================================
+   问事：一键起卦 + 针对性解读
+   ============================================================ */
+const ASK_TYPES=[
+ {k:'career',n:'事业',kw:['工作','职位','事业','项目','生意','客户','老板','领导','跳槽','考试','面试','创业','公司','晋升','加薪','加班','辞职','岗位','投标','单','同事关系','单位']},
+ {k:'love',n:'感情',kw:['感情','恋爱','结婚','离婚','老公','老婆','男友','女友','对象','表白','复合','分手','暧昧','相亲','婚姻','追求','老公']},
+ {k:'wealth',n:'财运',kw:['钱','财','投资','理财','收入','工资','收益','股票','基金','买房','贷款','借钱','存款','开销','成本','利润','赚钱','欠']},
+ {k:'relation',n:'人际',kw:['人际','朋友','同事','邻居','相处','得罪','误会','团队','人脉','求助','疏远','交情','人脉']},
+ {k:'decide',n:'决断',kw:['要不要','该不该','选择','决定','去留','还是','犹豫','拿不定','怎么办','如何','能不能','该不该']}
+];
+let askType=null;
+
+/* 自动判断问题类型。
+   关键：收录决断词（要不要/该不该…）几乎必然出现在任何问句里，
+   若让它参与打分会永远压过主题词（「这笔钱该不该投」会误判成决断）。
+   所以主题词先竞争，决断只作兜底。 */
+function detectType(txt){
+  const t=txt||'';
+  let best=null,score=0;
+  ASK_TYPES.filter(ty=>ty.k!=='decide').forEach(ty=>{
+    let s=0;
+    ty.kw.forEach(w=>{ if(t.includes(w)) s+=(w.length>=2?2:1); });
+    if(s>score){ score=s; best=ty.k; }
+  });
+  return best||'decide';
+}
+
+document.getElementById('askTypes').innerHTML=
+  ASK_TYPES.map(t=>'<button data-t="'+t.k+'">'+t.n+'</button>').join('');
+document.getElementById('askTypes').onclick=e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  const all=[...e.currentTarget.children];
+  if(askType===b.dataset.t){ askType=null; all.forEach(c=>c.classList.remove('on')); }
+  else { askType=b.dataset.t; all.forEach(c=>c.classList.remove('on')); b.classList.add('on'); }
+};
+
+function rollLines(){
+  const L=[];
+  for(let i=0;i<6;i++){ let s=0; for(let k=0;k<3;k++) s+=(Math.random()<0.5?3:2); L.push(s); }
+  return L;
+}
+
+const NMAP={'上吉':'n-good','吉':'n-good','平':'n-mid','吝':'n-bad','凶':'n-bad'};
+
+function renderAskResult(q,type,lines,save){
+  const d=divine(lines), ben=d.ben, bian=d.bian;
+  const adv=(window.YJ_ADVICE||{})[ben.n]||{};
+  const typeName=(ASK_TYPES.find(t=>t.k===type)||{n:'决断'}).n;
+  const mvTxt=d.moving.length? d.moving.map(i=>'第'+i+'爻').join('、') : '无动爻';
+  const now=new Date();
+  const ts=(now.getMonth()+1)+'月'+now.getDate()+'日 '+
+           String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+
+  let h='<div class="card" style="border-color:var(--accent)">';
+
+  /* ① 你问的事 */
+  h+='<div class="read-sec"><h3><span class="no">1</span>你问的事</h3>'+
+     '<div class="ask-q"><div class="q-label">'+typeName+'　'+ts+'</div>'+q+'</div></div>';
+
+  /* ② 得到这一卦 */
+  h+='<div class="read-sec"><h3><span class="no">2</span>得到这一卦</h3>';
+  h+='<div class="res-head" style="margin-bottom:2px"><div class="res-num">'+ben.n+'</div><div>'+
+     '<div class="res-name">'+ben.name+'</div>'+
+     '<div class="res-full">'+ben.full+'　'+ben.sym+'</div></div></div>';
+  h+='<div style="margin:8px 0 12px"><span class="chip-key">'+ben.key+'</span> '+
+     (adv.nature?'<span class="nature '+NMAP[adv.nature]+'">'+adv.nature+'</span>':'')+
+     ' <span class="act" style="font-size:11.5px;color:var(--ink3)">'+mvTxt+'</span></div>';
+  h+='<div class="hexbox">'+hexBlock(lines,'本 卦',ben.name,true);
+  if(bian.name!==ben.name) h+='<div class="arrow">→</div>'+hexBlock(lines,'变 卦',bian.name,false);
+  h+='</div>';
+  h+='<div class="hint" style="text-align:center;margin-top:4px">'+
+     '左边是<b>现在的处境</b>，右边是<b>发展下去的走向</b>，红框是动爻——这件事的关键变量。</div>';
+  h+='</div>';
+
+  /* ③ 这一卦在说什么 */
+  h+='<div class="read-sec"><h3><span class="no">3</span>这一卦在说什么</h3>'+
+     '<div class="quote"><div class="t">卦 辞</div>'+ben.judge+'</div>'+
+     '<div class="quote"><div class="t">大 象 传</div>'+ben.image+'</div>'+
+     '<div class="hint" style="color:var(--ink2);font-size:13.5px;line-height:1.9;margin-top:8px">'+ben.desc+'</div>'+
+     '</div>';
+
+  /* ④ 落到你这件事上 */
+  h+='<div class="read-sec"><h3 class="acc"><span class="no">4</span>落到你这件事上</h3>'+
+     '<div class="advice-box"><span class="tag">'+typeName+'</span><br>'+
+     (adv[type]||ben.desc)+'</div>';
+  const r=buildReading(d);
+  const focus=(r.primary[0]&&r.primary[0].hit)?ben.yao[r.primary[0].hit-1]:null;
+  if(focus){
+    h+='<div class="mv-note"><b>动爻提醒（'+focus[0]+'）</b><br>'+focus[1]+
+       '<br><span style="color:var(--ink3);font-size:12.5px">'+focus[2]+'</span></div>';
+  } else if(d.moving.length===0){
+    h+='<div class="mv-note"><b>没有动爻</b>——这件事目前没有明显的变量在动，'+
+       '局面相对静止，看整体走势即可，不必过度解读细节。</div>';
+  } else {
+    h+='<div class="mv-note"><b>'+d.moving.length+' 个爻同时发动</b>——说明这件事变数很多、'+
+       '牵扯面广。这时候看整体走势比盯住某一句更重要，耐心等关键的那一两个点先稳下来。</div>';
+  }
+  h+='</div>';
+
+  /* ⑤ 怎么做 */
+  h+='<div class="read-sec"><h3><span class="no">5</span>你现在可以这样做</h3><ul class="todo-list">';
+  (adv.todo||[]).forEach(t=>{ h+='<li>'+t+'</li>'; });
+  h+='</ul><div class="act-line">总的方向：'+ben.act+'</div></div>';
+
+  /* ⑥ 王弼 */
+  h+='<div class="read-sec"><h3><span class="no">6</span>王弼怎么看这一卦</h3>'+
+     '<div class="wb" style="font-size:13.5px;line-height:1.9">'+ben.wangbi+'</div></div>';
+
+  h+='<button class="btn ghost sm" style="margin-top:18px" onclick="openGua('+ben.n+')">查看 '+ben.name+' 卦完整详解 →</button>';
+  h+='</div>';
+
+  document.getElementById('askResult').innerHTML=h;
+  if(save){
+    try{
+      let hs=JSON.parse(localStorage.getItem('yj_ask')||'[]');
+      hs.unshift({t:Date.now(),q:q,type:type,lines:lines,ben:ben.name,bian:bian.name});
+      localStorage.setItem('yj_ask',JSON.stringify(hs.slice(0,20)));
+    }catch(e){}
+    renderAskHist();
+  }
+  const el=document.getElementById('askResult');
+  window.scrollTo({top:el.offsetTop-70,behavior:'smooth'});
+}
+
+document.getElementById('btnAsk').onclick=()=>{
+  const q=document.getElementById('askText').value.trim();
+  if(!q){ alert('先写下你要问的事 —— 问题越具体，卦越准。'); return; }
+  renderAskResult(q, askType||detectType(q), rollLines(), true);
+};
+
+function renderAskHist(){
+  let hs=[]; try{ hs=JSON.parse(localStorage.getItem('yj_ask')||'[]'); }catch(e){}
+  const el=document.getElementById('askHist');
+  if(!hs.length){ el.innerHTML='<p class="hint">还没有记录。问过的事会存在这里，方便回头对照（本地保存，不上传）。</p>'; return; }
+  el.innerHTML=hs.map(x=>{
+    const dt=new Date(x.t);
+    const ts=(dt.getMonth()+1)+'/'+dt.getDate()+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+    const short=x.q.length>16?x.q.slice(0,16)+'…':x.q;
+    return '<div class="hist-item" onclick=\'rerun('+JSON.stringify(x.lines)+',"'+encodeURIComponent(x.q)+'","'+(x.type||'decide')+'")\'>'+
+      '<div class="hg">'+x.ben+(x.bian!==x.ben?'→'+x.bian:'')+'</div>'+
+      '<div class="hm">'+short+'<br><span style="color:var(--ink3);font-size:11px">'+ts+'</span></div>'+
+      '<div class="ht">'+(((ASK_TYPES.find(t=>t.k===x.type)||{}).n)||'')+'</div></div>';
+  }).join('');
+}
+function rerun(lines,qenc,type){
+  renderAskResult(decodeURIComponent(qenc),type,lines,false);
+}
+window.rerun=rerun;
+
+document.getElementById('btnClearAsk').onclick=()=>{
+  if(confirm('清空全部问事记录？')){ try{localStorage.setItem('yj_ask','[]');}catch(e){} renderAskHist(); }
+};
+renderAskHist();
 
 /* 使用说明折叠 */
 function toggleHowto(){
