@@ -220,6 +220,29 @@ footer b{color:var(--accent)}
 
   <!-- ============ 起卦 ============ -->
   <div class="view on" id="v-div">
+
+    <div class="card" onclick="toggleHowto()" style="padding:12px 16px;cursor:pointer;margin-bottom:12px;background:var(--gold-soft);border-color:#e8dcb8">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--gold)">
+        <span style="width:18px;height:18px;border-radius:50%;background:var(--gold);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none">?</span>
+        第一次用？点这里看怎么用
+        <span id="howtoArrow" style="margin-left:auto;font-size:11px;color:var(--ink3)">展开 ▾</span>
+      </div>
+      <div id="howtoBody" style="display:none;margin-top:12px;font-size:13px;color:var(--ink2);line-height:1.9">
+        <p style="margin-bottom:9px"><b style="color:var(--ink)">① 心里只想一件具体的事。</b>问题越具体卦越准：<br>
+        <span style="color:var(--ink3)">✗「今年运势怎么样」　✓「这份新工作要不要接」</span></p>
+        <p style="margin-bottom:9px"><b style="color:var(--ink)">② 选一种方式起卦。</b>正经问事用<b>金钱卦</b>，摇六次成卦。</p>
+        <p style="margin-bottom:9px"><b style="color:var(--ink)">③ 从上往下读结果：</b><br>
+        <b>本卦</b>＝你现在处境　→　<b>变卦</b>＝事情走向<br>
+        <b style="color:var(--accent)">红框标出的爻就是动爻</b>＝这件事的关键变量<br>
+        拿不准就看最后的「该进 / 该退 / 该等」。</p>
+        <p style="margin-bottom:9px"><b style="color:var(--ink)">④ 要看完整六爻</b>，点结果页底部的「查看完整详解」；<br>
+        想直接查某一卦，点下面的「六十四卦」标签。</p>
+        <p style="margin:10px 0 0;padding-top:9px;border-top:1px dashed #e0d3ae;color:var(--ink3)">
+        ⚠️ <b style="color:var(--gold)">初筮告，再三渎，渎则不告。</b>同一件事别反复重摇，<br>
+        摇到满意为止的卦毫无意义。第一卦就是你的卦。</p>
+      </div>
+    </div>
+
     <div class="methods" id="methods">
       <button class="on" data-m="coin">金钱卦</button>
       <button data-m="num">数字</button>
@@ -305,6 +328,11 @@ footer b{color:var(--accent)}
 </div>
 
 <footer>
+  <div style="margin-bottom:16px">
+    <span style="color:var(--ink3)">在线地址　</span>
+    <a href="https://chenyirunshen.github.io/yijing/" target="_blank" rel="noopener"
+       style="color:var(--accent);font-weight:700;text-decoration:none">chenyirunshen.github.io/yijing</a>
+  </div>
   卦爻辞依《周易》通行本（文王卦序）；「王弼义理」为依王弼《周易注》义理派思路所作的<br>
   现代诠释，非逐字原文，深研请回原典。<br><br>
   <b>它是决策的参考、自省的镜子，不是判决书。</b>　不断他人命运，不替代专业医疗与法律意见。
@@ -763,6 +791,16 @@ document.getElementById('tabbar').onclick=e=>{
   document.getElementById(b.dataset.v).classList.add('on');
   window.scrollTo(0,0);
 };
+
+/* 使用说明折叠 */
+function toggleHowto(){
+  const b=document.getElementById('howtoBody');
+  const a=document.getElementById('howtoArrow');
+  const open = b.style.display==='none';
+  b.style.display = open?'block':'none';
+  a.textContent = open?'收起 ▴':'展开 ▾';
+}
+window.toggleHowto=toggleHowto;
 
 /* 暴露给 onclick（模块外调用） */
 window.openGua=openGua;
